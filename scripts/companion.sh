@@ -6,12 +6,6 @@ if [ "$UID" = "0" ];then
 	exit -1
 fi
 
-#Make sure script is run from 'nvidia' user account
-if [ "$USER" != "nvidia" ];then
-	echo "Run script from 'nvidia' user account"
-	exit -1
-fi
-
 #Print usage/help page
 if [ "$1" != "update" ] && [ "$1" != "install" ];then
 	clear
@@ -74,17 +68,6 @@ get_repo(){
 	fi
 }
 
-#get companion repo
-get_repo "$HOME/companion" "https://github.com/kdkalvik/companion.git"
-
-#if changes were made in remote repo, update repo and run new setup script
-if [ $? -eq -2 ];then
-	cd $HOME/companion
-	git pull origin master
-	$HOME/companion/scripts/companion.sh $1
-	exit 0
-fi
-
 #create logs folder if not there
 if [ ! -d $HOME/companion/logs ];then
 	mkdir $HOME/companion/logs
@@ -127,39 +110,36 @@ if [ "$1" != "update" ]; then
 	source ~/.bashrc
 fi
 
-#install if remote was updated or cloned for the first time
-get_repo "$HOME/mavlink" "https://github.com/bluerobotics/mavlink.git"
-if [ $? != 0 ];then
-	pushd mavlink
-	git pull origin master
-	git submodule init && git submodule update --recursive
-	pushd pymavlink
-	sudo python setup.py build install
-	popd
-	popd
-fi
+# Install mavlink & pymavlink
+git clone https://github.com/mavlink/mavlink.git $HOME/mavlink
 
-#install if remote was updated or clones for the first time
+pushd mavlink
+git submodule init && git submodule update --recursive
+pushd pymavlink
+sudo python setup.py build install
+popd
+popd
+
+# Install MAVProxy
 get_repo "$HOME/mavproxy" "https://github.com/bluerobotics/MAVProxy.git"
-if [ $? != 0 ];then
-	pushd mavproxy
-	git pull origin master
-	sudo python setup.py build install
-	popd
-fi
+
+git clone https://github.com/bluerobotics/MAVProxy.git $HOME/mavproxy
+pushd mavproxy
+git pull origin master
+sudo python setup.py build install
+popd
 
 #run only if update flag was not set
 if [ "$1" != "update" ]; then
 	#update rc.local to start scripts on boot
-	S1="sleep 10"
-	S2="sudo -H -u nvidia /bin/bash -c '/home/nvidia/companion/scripts/autostart_mavproxy.sh'"
-	S3="sudo -H -u nvidia /bin/bash -c '/home/nvidia/companion/scripts/autostart_gstreamer.sh'"
+	S1="sleep 2"
+	S2="sudo -H -u $USER /bin/bash -c '$HOME/companion/scripts/autostart_mavproxy.sh'"
+	S3="sudo -H -u $USER /bin/bash -c '$HOME/companion/scripts/autostart_gstreamer.sh'"
 
-	sudo sed -i -e "\%$S1%d" \
-	-e "\%$S2%d" \
-	-e "\%$S3%d" \
-	-e "0,/^[^#]*exit 0/s%%$S1\n$S2\n$S3\n&%" \
-	/etc/rc.local
+	sudo sh -c "echo #!/bin/bash >> /etc/rc.local"
+	sudo sh -c "echo $S1 >> /etc/rc.local"
+	sudo sh -c "echo $S2 >> /etc/rc.local"
+	sudo sh -c "echo $S3 >> /etc/rc.local"
 
 	#create symbolic link for pixhawk in /dev
 	sudo sh -c "echo 'SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"26ac\", ATTRS{idProduct}==\"0011\", SYMLINK+=\"pixhawk\"' > /etc/udev/rules.d/99-usb-serial.rules"
@@ -174,15 +154,15 @@ if [ "$1" != "update" ]; then
 	sudo_update_file "    netmask 255.255.255.0" /etc/network/interfaces
 
 	#install ros
-	$HOME/companion/scripts/install_ros.sh
+	#$HOME/companion/scripts/install_ros.sh
 fi
 
 sudo apt-get autoremove -y
 sudo apt-get autoclean -y
 
 #Disable gui
-sudo systemctl disable lightdm.service
-sudo chmod -x /usr/sbin/lightdm
+#sudo systemctl disable lightdm.service
+#sudo chmod -x /usr/sbin/lightdm
 
 #Restart Jetson
 sudo shutdown -r now
