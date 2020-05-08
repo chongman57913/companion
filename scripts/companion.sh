@@ -111,6 +111,7 @@ if [ "$1" != "update" ]; then
 fi
 
 # Install mavlink & pymavlink
+cd $HOME
 git clone https://github.com/mavlink/mavlink.git $HOME/mavlink
 
 pushd mavlink
@@ -121,8 +122,7 @@ popd
 popd
 
 # Install MAVProxy
-get_repo "$HOME/mavproxy" "https://github.com/bluerobotics/MAVProxy.git"
-
+cd $HOME
 git clone https://github.com/bluerobotics/MAVProxy.git $HOME/mavproxy
 pushd mavproxy
 git pull origin master
