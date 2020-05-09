@@ -101,6 +101,11 @@ if [ "$1" != "update" ]; then
 	sudo -H pip install future
 	sudo -H pip install pyserial -U
 
+
+	# Python 3
+	sudo apt-get install -y python3-pip
+	sudo pip3 install -U pip testresources setuptools future==0.17.1 pyserial pymavlink 
+
 	#remove modemmanager interferes with serial devices and add user to dialout to get access to serial devices
 	sudo apt-get purge modemmanager -y
 	sudo adduser $USER dialout
@@ -136,10 +141,12 @@ if [ "$1" != "update" ]; then
 	S2="sudo -H -u $USER /bin/bash -c '$HOME/companion/scripts/autostart_mavproxy.sh'"
 	S3="sudo -H -u $USER /bin/bash -c '$HOME/companion/scripts/autostart_gstreamer.sh'"
 
-	sudo sh -c "echo #!/bin/bash >> /etc/rc.local"
+	sudo sh -c "echo '#!/bin/bash' >> /etc/rc.local"
 	sudo sh -c "echo $S1 >> /etc/rc.local"
 	sudo sh -c "echo $S2 >> /etc/rc.local"
 	sudo sh -c "echo $S3 >> /etc/rc.local"
+
+	sudo chmod u+x /etc/rc.local
 
 	#create symbolic link for pixhawk in /dev
 	sudo sh -c "echo 'SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"26ac\", ATTRS{idProduct}==\"0011\", SYMLINK+=\"pixhawk\"' > /etc/udev/rules.d/99-usb-serial.rules"
@@ -155,6 +162,8 @@ if [ "$1" != "update" ]; then
 
 	#install ros
 	#$HOME/companion/scripts/install_ros.sh
+	
+	bash $HOME/companion/scripts/install_deep_learning_framework.sh
 fi
 
 sudo apt-get autoremove -y
