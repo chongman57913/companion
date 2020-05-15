@@ -85,6 +85,9 @@ sudo apt-get upgrade -y
 
 #run only if update flag was not set
 if [ "$1" != "update" ]; then
+	# run system config
+	bash $HOME/companion/scripts/run_system_config.sh	
+	
 	#add universe repo
 	sudo apt-get install software-properties-common -y
 	sudo apt-add-repository universe -y
@@ -162,7 +165,7 @@ if [ "$1" != "update" ]; then
 
 	#install ros
 	#$HOME/companion/scripts/install_ros.sh
-	
+
 	bash $HOME/companion/scripts/install_deep_learning_framework.sh
 fi
 
