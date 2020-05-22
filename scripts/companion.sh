@@ -166,7 +166,11 @@ if [ "$1" != "update" ]; then
 	#install ros
 	#$HOME/companion/scripts/install_ros.sh
 
+	# install deep learning framework
 	bash $HOME/companion/scripts/install_deep_learning_framework.sh
+
+	# install remote desktop
+	bash $HOME/companion/scripts/install_xrdp.sh
 fi
 
 sudo apt-get autoremove -y
