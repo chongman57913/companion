@@ -11,7 +11,7 @@ cd $HOME
 wget https://nvidia.box.com/shared/static/3ibazbiwtkl181n95n9em3wtrca7tdzp.whl -O torch-1.5.0-cp36-cp36m-linux_aarch64.whl
 sudo apt-get install libopenblas-base libopenmpi-dev -y
 sudo pip3 install -U Cython
-sudo pip3 install torch-1.4.0-cp36-cp36m-linux_aarch64.whl
+sudo pip3 install torch-1.5.0-cp36-cp36m-linux_aarch64.whl
 rm torch-1.5.0-cp36-cp36m-linux_aarch64.whl
 
 
