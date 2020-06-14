@@ -95,7 +95,7 @@ if [ "$1" != "update" ]; then
 
 	#install required packages
 	sudo apt-get install -y git screen openssh-server nano
-	sudo apt-get install -y gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+	sudo apt-get install -y gstreamer1.0-plugins-base python-gst-1.0 gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gir1.2-gst-plugins-base-1.0 gir1.2-gstreamer-1.0
 	sudo apt-get install -y python-dev python-opencv python-pip python-libxml2  python-wxgtk3.0 python-matplotlib python-pygame
 	sudo apt-get install -y python-setuptools python-dev build-essential
 	sudo apt-get install -y libxml2-dev libxslt1-dev
